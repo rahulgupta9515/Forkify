@@ -3,6 +3,7 @@ import * as searchView from './Views/searchView';
 import * as recipeView from './Views/recipeView';
 import {elements, renderloader, clearLoader} from './Views/base';
 import Recipe from './models/Recipe';
+import List from './models/List';
 
 /**Global state
  * search obj
@@ -107,3 +108,22 @@ const controlRecipe = async () => {
 // window.addEventListener('load', controlRecipe)
 ['hashchange', 'load'].forEach(event => window.addEventListener(event, controlRecipe)) 
  
+
+//Handling Recipe button clicks
+elements.recipe.addEventListener('click', e => {
+    if(e.target.matches('.btn-decrease, .btn-decrease *')){
+        //Decrease btn clicked
+        if(state.recipe.servings > 1){
+            state.recipe.updateServings('dec');
+            recipeView.updateServiceIngredient(state.recipe);
+        }
+    }
+
+    if(e.target.matches('.btn-increase, .btn-increase *')){
+        //increase btn clicked
+        state.recipe.updateServings('inc');
+        recipeView.updateServiceIngredient(state.recipe);
+    }
+});
+
+window.loc = new List();
