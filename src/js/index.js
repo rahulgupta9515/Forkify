@@ -1,9 +1,11 @@
 import Search from './models/Search';
 import Recipe from './models/Recipe';
 import List from './models/List';
+import Likes from './models/Likes';
 import * as searchView from './Views/searchView';
 import * as recipeView from './Views/recipeView';
 import * as listView from './Views/listView';
+import * as likesView from './Views/likesView';
 import {elements, renderloader, clearLoader} from './Views/base';
 
 /**Global state
@@ -97,7 +99,7 @@ const controlRecipe = async () => {
     
             //Render recipe
             clearLoader();
-            recipeView.renderRecipe(state.recipe);
+            recipeView.renderRecipe(state.recipe, state.likes.isLiked(id));
 
         }catch(error){
             alert(error);
@@ -145,9 +147,53 @@ elements.shopping.addEventListener('click', el => {
 
 
 });
+
+/*
+*Like Controller
+*/
+
+//For Testing
+state.likes = new Likes();
+likesView.toggelLikeMenu(state.likes.getNumLikes());
+
+const constrolLike = () => {
+    if(!state.likes) state.likes = new Likes();
+
+    const currID = state.recipe.id;
+
+    //User has not likes the current recipe
+    if(!state.likes.isLiked(currID)){
+        //Add Like to state
+        const newLike = state.likes.addLike(
+            currID,
+            state.recipe.title,
+            state.recipe.author,
+            state.recipe.img
+        )
+
+        //Toggle the like button
+        likesView.toggleLikeBtn(true);
+
+        //Add like to UI list
+        likesView.renderLike(newLike);
+
+    //User has liked the current recipe    
+    }else{
+
+        //remove Like to state
+        state.likes.deleteLike(currID);
+
+        //Toggle the like button
+        likesView.toggleLikeBtn(false);
+
+        //remove like to UI list
+       likesView.deleteLike(currID);
+    }
+    likesView.toggelLikeMenu(state.likes.getNumLikes());
+}
  
 
-//Handling Recipe button clicks
+//Handling Recipe button clicks, All recipe evenet are handling here
 elements.recipe.addEventListener('click', e => {
     if(e.target.matches('.btn-decrease, .btn-decrease *')){
         //Decrease btn clicked
@@ -162,9 +208,13 @@ elements.recipe.addEventListener('click', e => {
         state.recipe.updateServings('inc');
         recipeView.updateServiceIngredient(state.recipe);
     
-    //Handle count update
     }else if(e.target.matches('.recipe__btn--add, .recipe__btn--add *')){
+        //Add ingredient to shopping list
         controlList();
+    
+    }else if(e.target.matches('.recipe__love, .recipe__love *')){//* denotes that we are selecting childs as well
+        //Like controller
+        constrolLike();
     }
 });
 
