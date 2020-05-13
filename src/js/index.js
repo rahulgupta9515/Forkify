@@ -16,7 +16,6 @@ import {elements, renderloader, clearLoader} from './Views/base';
  * */
 
 const state = {};
-window.state = state;
 
 /**
  * Search Controller
@@ -152,7 +151,6 @@ elements.shopping.addEventListener('click', el => {
 *Like Controller
 */
 
-//For Testing
 state.likes = new Likes();
 likesView.toggelLikeMenu(state.likes.getNumLikes());
 
@@ -191,6 +189,19 @@ const constrolLike = () => {
     }
     likesView.toggelLikeMenu(state.likes.getNumLikes());
 }
+
+//Restore like recipe on page load
+window.addEventListener('load', () => {
+    state.likes = new Likes();
+    //Restore likes
+    state.likes.readStotage();
+
+    //toggle likes menue button
+    likesView.toggelLikeMenu(state.likes.getNumLikes());
+
+    //Render all likes recipes -existing likes
+    state.likes.likes.forEach(like => likesView.renderLike(like));
+});
  
 
 //Handling Recipe button clicks, All recipe evenet are handling here
@@ -218,4 +229,3 @@ elements.recipe.addEventListener('click', e => {
     }
 });
 
-window.loc = new List();
